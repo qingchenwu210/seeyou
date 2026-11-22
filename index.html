@@ -94,7 +94,7 @@ box-shadow:0 10px 26px rgba(217,72,122,.12);font-size:14px;line-height:1.8;color
     <span class="chips" id="ages"><button class="chip" data-a="05后">05后</button><button class="chip" data-a="00后">00后</button><button class="chip" data-a="95后">95后</button><button class="chip" data-a="90后">90后</button><button class="chip" data-a="85前">85后及以上</button></span>
   </div>
   <button class="btn" id="toRecord">开始</button>
-  <p class="foot">一个能安放你最真实样子的地方。<br>你的声音只存在这台手机里，不上传，谁也听不到。</p>
+  <p class="foot">一个能安放你最真实样子的地方。<br>你的声音只存在这台手机里，不上传，谁也听不到。<br>我们只匿名统计年龄段和称呼选项，不收集名字。</p>
 </section>
 
 <!-- 2 录音 -->
@@ -158,7 +158,7 @@ const withCall = (rest)=>{ const c = callName(); return c ? c+'，'+rest : rest;
 
 // 1 起名
 function fillSay(){ $('sayThis').textContent = '“'+withCall('别担心，我现在过得很好。你现在做的所有的一切，都没有白费。我在这里等你，90天后见。')+'”'; }
-$('toRecord').onclick = ()=>{
+$('toRecord').onclick = ()=>{ setTimeout(countOnce, 0);
   const n = $('nameInput').value.trim();
   if(n) store.set('name', n);
   $('recTitle').innerHTML = withCall('现在你就是')+'<br>90天后的她'; markChip(); fillSay();
@@ -228,6 +228,16 @@ $('reRecord').onclick = ()=>{ fillSay(); markChip(); $('recTitle').innerHTML = w
 (()=>{ const box=$('stickers'); for(let i=0;i<9;i++){ const h=document.createElement('i'); h.className='heart'; h.textContent='♥';
   h.style.left=(Math.random()*100)+'%'; h.style.fontSize=(14+Math.random()*16)+'px';
   h.style.animationDuration=(9+Math.random()*8)+'s'; h.style.animationDelay=(-Math.random()*12)+'s'; box.appendChild(h);} })();
+
+// 匿名计数：只发年龄段和称呼类型，不发名字和声音；每台手机只发一次
+const STATS_URL = 'https://seeyou-chat.1473160316.workers.dev/count';
+function callType(){ const c = store.get('call');
+  if(c===null||c===undefined) return name() ? '名字小名' : '就叫你';
+  if(c==='') return '就叫你'; if(c==='宝子'||c==='铁子') return c;
+  return /^[A-Za-z]/.test(c) ? '英文名' : '名字小名'; }
+function countOnce(){ if(store.get('counted')) return;
+  try{ fetch(STATS_URL,{method:'POST',headers:{'Content-Type':'application/json'},keepalive:true,
+    body:JSON.stringify({age:store.get('age')||'未选', call:callType()})}).then(r=>{ if(r.ok) store.set('counted','1'); }).catch(()=>{}); }catch(e){} }
 
 // 称呼选项
 function markChip(){ const c=store.get('call'); document.querySelectorAll('#chips .chip').forEach(b=>{ const d=b.dataset.c; const on = (c===null||c===undefined) ? d==='name' : (d==='name'? c===name() && c!=='' : d==='en' ? false : d===c); b.classList.toggle('on', on); }); }
