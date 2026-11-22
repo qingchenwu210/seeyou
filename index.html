@@ -107,6 +107,8 @@ box-shadow:0 10px 26px rgba(217,72,122,.12);font-size:14px;line-height:1.8;color
   <button class="play" id="playBtn" aria-label="播放">▶</button>
   <audio id="player" style="display:none"></audio>
   <p class="count" id="listenCount"></p>
+  <button class="btn ghost" id="remindBtn">📅 到第 90 天，提醒我来听</button>
+  <p class="count" id="remindTip" style="display:none"></p>
   <p class="foot">
     <span id="startDate"></span><br>
     <button class="link" id="reRecord">重新录一段</button>
@@ -203,6 +205,33 @@ $('reRecord').onclick = ()=>{ $('recTitle').innerHTML = name()+'，现在你就�
 (()=>{ const box=$('stickers'); for(let i=0;i<9;i++){ const h=document.createElement('i'); h.className='heart'; h.textContent='♥';
   h.style.left=(Math.random()*100)+'%'; h.style.fontSize=(14+Math.random()*16)+'px';
   h.style.animationDuration=(9+Math.random()*8)+'s'; h.style.animationDelay=(-Math.random()*12)+'s'; box.appendChild(h);} })();
+
+// 加到手机日历：每天晚上 9 点提醒听一遍，第 90 天早上 9 点提醒“我们见面了”
+function icsDate(d,h){ const p=n=>String(n).padStart(2,'0'); return d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+'T'+p(h)+'0000'; }
+function makeICS(){
+  const s = store.get('start') || new Date().toISOString().slice(0,10);
+  const start = new Date(s+'T00:00:00'); const end = new Date(start.getTime()+90*864e5);
+  const today = new Date(); today.setHours(0,0,0,0);
+  const left = Math.max(1, Math.round((end-today)/864e5));
+  const url = location.href.split('#')[0];
+  const ev = (uid,dt,summary,desc,rrule)=>['BEGIN:VEVENT','UID:'+uid+'@seeyou','DTSTAMP:'+icsDate(new Date(),0),'DTSTART:'+dt,'DURATION:PT10M',rrule||'','SUMMARY:'+summary,'DESCRIPTION:'+desc+' '+url,'URL:'+url,'BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:'+summary,'TRIGGER:PT0M','END:VALARM','END:VEVENT'].filter(Boolean).join('\r\n');
+  return ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//SeeYou//CN','CALSCALE:GREGORIAN',
+    ev('daily-'+s, icsDate(today,21), '听一遍90天后的你说话', '打开 SeeYou，听自己的声音', 'RRULE:FREQ=DAILY;COUNT='+left),
+    ev('day90-'+s, icsDate(end,9), '今天，90天后的你来了', '90天到了，打开 SeeYou 听听当初的自己'),
+    'END:VCALENDAR'].join('\r\n');
+}
+$('remindBtn').onclick = ()=>{
+  const tip = $('remindTip'); tip.style.display='block';
+  if(/MicroMessenger/i.test(navigator.userAgent)){
+    tip.innerHTML='微信里加不了日历。点右上角 <b>···</b>，选「在浏览器打开」，再点一次这个按钮。'; return;
+  }
+  try{
+    const blob = new Blob([makeICS()],{type:'text/calendar;charset=utf-8'});
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'SeeYou提醒.ics';
+    document.body.appendChild(a); a.click(); a.remove();
+    tip.textContent='在弹出的页面里点「添加到日历」。以后每天晚上 9 点提醒你听一遍，第 90 天早上会提醒你：我们见面了。';
+  }catch(e){ tip.textContent='这个手机加不了，先截图记下今天的日期吧。'; }
+};
 
 // 打开时：录过就直接进首页
 (async ()=>{
