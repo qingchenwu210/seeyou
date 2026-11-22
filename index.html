@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>SeeYou</title>
+<style>
+:root{--bg1:#fff4f7;--bg2:#f7d3e0;--ink:#5b2443;--soft:#9a5f7d;--rose:#d9487a;--card:#fffafc;--line:#f0c6d6}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:-apple-system,"PingFang SC","Noto Sans SC","Microsoft YaHei",sans-serif;color:var(--ink);
+background:linear-gradient(180deg,var(--bg1),var(--bg2));min-height:100vh;display:flex;justify-content:center}
+.app{width:100%;max-width:440px;padding:28px 20px 40px;display:flex;flex-direction:column;min-height:100vh}
+.screen{display:none;flex:1;flex-direction:column;animation:in .5s ease}
+.screen.on{display:flex}
+@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.brand{text-align:center;letter-spacing:6px;font-size:13px;color:var(--soft);margin-bottom:6px}
+h1{font-size:30px;text-align:center;line-height:1.35;margin:10px 0 8px}
+.sub{text-align:center;color:var(--soft);font-size:15px;line-height:1.7}
+.arch{margin:26px auto 22px;width:220px;height:280px;border-radius:110px 110px 18px 18px;
+background:linear-gradient(180deg,#ffe3ec,#f5b8cd 70%,#eea3bf);position:relative;overflow:hidden;
+box-shadow:0 18px 40px rgba(217,72,122,.18),inset 0 0 0 8px rgba(255,255,255,.55)}
+.arch .sun{position:absolute;left:50%;top:70px;width:90px;height:90px;margin-left:-45px;border-radius:50%;
+background:radial-gradient(circle,#fffaf0,#ffd9b8 60%,transparent 70%);animation:glow 4s ease-in-out infinite}
+@keyframes glow{50%{transform:scale(1.08);opacity:.85}}
+.arch .hill{position:absolute;bottom:-40px;left:-30px;right:-30px;height:120px;border-radius:50%;background:#f7c6d6}
+.arch .days{position:absolute;left:0;right:0;bottom:26px;text-align:center;color:#fff;text-shadow:0 2px 8px rgba(150,40,80,.35)}
+.arch .days b{display:block;font-size:46px;line-height:1}
+.arch .days span{font-size:13px;letter-spacing:2px}
+input{width:100%;padding:15px 16px;border:1.5px solid var(--line);border-radius:14px;font-size:17px;background:#fff;color:var(--ink);outline:none;margin-top:22px}
+input:focus{border-color:var(--rose)}
+.btn{display:block;width:100%;margin-top:16px;padding:16px;border:0;border-radius:999px;font-size:17px;font-weight:600;
+background:var(--rose);color:#fff;box-shadow:0 10px 24px rgba(217,72,122,.3);cursor:pointer}
+.btn.ghost{background:transparent;color:var(--rose);box-shadow:none;border:1.5px solid var(--line)}
+.btn:disabled{opacity:.45}
+.tips{background:var(--card);border-radius:18px;padding:18px;margin-top:20px;line-height:1.9;font-size:15px;border:1px solid var(--line)}
+.tips b{color:var(--rose)}
+.rec{margin:26px auto 6px;width:132px;height:132px;border-radius:50%;border:0;background:var(--rose);color:#fff;font-size:17px;font-weight:600;
+box-shadow:0 0 0 12px rgba(217,72,122,.15);cursor:pointer}
+.rec.going{animation:pulse 1.4s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 26px rgba(217,72,122,.06)}}
+.timer{text-align:center;color:var(--soft);font-size:14px;min-height:22px}
+.play{margin:6px auto 4px;width:96px;height:96px;border-radius:50%;border:0;background:#fff;color:var(--rose);font-size:34px;
+box-shadow:0 12px 30px rgba(217,72,122,.25);cursor:pointer}
+.count{text-align:center;font-size:13px;color:var(--soft);margin-top:8px}
+.foot{text-align:center;font-size:12px;color:var(--soft);margin-top:auto;padding-top:26px;line-height:1.7}
+.link{background:none;border:0;color:var(--soft);font-size:13px;text-decoration:underline;margin-top:14px;cursor:pointer}
+.hello{text-align:center;font-size:20px;margin-top:6px}
+.stickers{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.stickers span{position:absolute;font-size:34px;filter:drop-shadow(0 6px 8px rgba(217,72,122,.25));animation:bob 5s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-10px) rotate(6deg)}}
+.heart{position:absolute;bottom:-40px;color:#ff8fb3;opacity:.7;animation:rise linear infinite}
+@keyframes rise{to{transform:translateY(-110vh) translateX(20px);opacity:0}}
+.app{position:relative;z-index:1}
+.arch .icons{position:absolute;top:24px;left:0;right:0;text-align:center;font-size:30px;letter-spacing:10px}
+.letter{background:var(--card);border-radius:18px;padding:16px 18px;margin:4px 0 0;border:1px solid var(--line);
+box-shadow:0 10px 26px rgba(217,72,122,.12);font-size:14px;line-height:1.8;color:var(--soft)}
+.letter b{color:var(--ink);font-size:16px}
+</style>
+</head>
+<body>
+<div class="stickers" id="stickers">
+  <span style="left:6%;top:4%">✈️</span><span style="right:8%;top:5%;animation-delay:-1s">💍</span>
+  <span style="left:46%;top:2%;font-size:24px;animation-delay:-2s">✨</span>
+  <span style="left:4%;bottom:10%;animation-delay:-3s">🐶</span><span style="left:22%;bottom:5%;font-size:28px;animation-delay:-1.5s">☕</span>
+  <span style="right:6%;bottom:9%;animation-delay:-2.5s">👜</span><span style="right:24%;bottom:4%;font-size:26px;animation-delay:-4s">💌</span>
+  <span style="right:3%;top:42%;font-size:28px;animation-delay:-.5s">👑</span><span style="left:3%;top:46%;font-size:26px;animation-delay:-3.5s">💋</span>
+</div>
+<div class="app">
+
+<!-- 1 起名 -->
+<section class="screen" id="s-name">
+  <div class="brand">SEE YOU</div>
+  <h1>90天后的你<br>有话想对你说</h1>
+  <p class="sub">用你自己的声音，录一段90天后的你<br>写给现在的你的话。每天打开，听一遍。</p>
+  <div class="arch"><div class="icons">💰 💗 💄</div><div class="sun"></div><div class="hill"></div><div class="days"><b>90</b><span>天后见</span></div></div>
+  <div class="letter"><b>“你现在做的所有的一切，都没有白费。”</b><br>钱，有选择的自由；爱，被爱也爱自己；美，状态一直在线。<br>90天后的你，已经做到了。</div>
+  <input id="nameInput" maxlength="12" placeholder="她该怎么叫你？比如：宝贝、小雨">
+  <button class="btn" id="toRecord">开始</button>
+  <p class="foot">一个能安放你最真实样子的地方。<br>你的声音只存在这台手机里，不上传，谁也听不到。</p>
+</section>
+
+<!-- 2 录音 -->
+<section class="screen" id="s-record">
+  <div class="brand">SEE YOU</div>
+  <h1 id="recTitle">现在，你就是<br>90天后的她</h1>
+  <div class="tips">
+    闭上眼，想象90天后的你，已经过上了你想要的日子。<br>
+    用她的口气，对现在的你说三句话：<br>
+    <b>1.</b> 别担心，我现在过得怎么样<br>
+    <b>2.</b> 你现在做的哪件事，没有白费<br>
+    <b>3.</b> 我在这里等你，90天后见
+  </div>
+  <button class="rec" id="recBtn">按一下<br>开始说</button>
+  <div class="timer" id="timer">最长90秒，说错了可以重来</div>
+  <audio id="preview" controls style="display:none;width:100%;margin-top:12px"></audio>
+  <button class="btn" id="saveBtn" style="display:none">就是这段，存下来</button>
+  <button class="btn ghost" id="redoBtn" style="display:none">重新录</button>
+  <p class="foot" id="micHint"></p>
+</section>
+
+<!-- 3 每天打开 -->
+<section class="screen" id="s-home">
+  <div class="brand">SEE YOU</div>
+  <p class="hello" id="hello"></p>
+  <div class="arch"><div class="icons">💰 💗 💄</div><div class="sun"></div><div class="hill"></div><div class="days"><b id="daysLeft">90</b><span id="daysLabel">天后见</span></div></div>
+  <button class="play" id="playBtn" aria-label="播放">▶</button>
+  <audio id="player" style="display:none"></audio>
+  <p class="count" id="listenCount"></p>
+  <p class="foot">
+    <span id="startDate"></span><br>
+    <button class="link" id="reRecord">重新录一段</button>
+  </p>
+</section>
+
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const store = {
+  get(k){ try { return localStorage.getItem('jianni_'+k); } catch(e){ return null; } },
+  set(k,v){ try { localStorage.setItem('jianni_'+k, v); } catch(e){} }
+};
+// IndexedDB：存声音
+function db(){ return new Promise((ok,no)=>{ try{
+  const r = indexedDB.open('jianni',1);
+  r.onupgradeneeded = ()=> r.result.createObjectStore('v');
+  r.onsuccess = ()=> ok(r.result); r.onerror = ()=> no(r.error);
+}catch(e){ no(e); } }); }
+async function putVoice(blob){ const d = await db(); return new Promise((ok,no)=>{ const t=d.transaction('v','readwrite'); t.objectStore('v').put(blob,'voice'); t.oncomplete=ok; t.onerror=()=>no(t.error); }); }
+async function getVoice(){ try{ const d = await db(); return await new Promise(ok=>{ const r=d.transaction('v').objectStore('v').get('voice'); r.onsuccess=()=>ok(r.result||null); r.onerror=()=>ok(null); }); }catch(e){ return null; } }
+
+function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on', s.id===id)); window.scrollTo(0,0); }
+const name = ()=> store.get('name') || '宝贝';
+
+// 1 起名
+$('toRecord').onclick = ()=>{
+  const n = $('nameInput').value.trim();
+  if(n) store.set('name', n);
+  $('recTitle').innerHTML = name() + '，现在你就是<br>90天后的她';
+  show('s-record');
+};
+
+// 2 录音
+let rec, chunks=[], blob=null, tick, sec=0;
+$('recBtn').onclick = async ()=>{
+  if(rec && rec.state==='recording'){ rec.stop(); return; }
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({audio:true});
+    chunks=[]; rec = new MediaRecorder(stream);
+    rec.ondataavailable = e=> chunks.push(e.data);
+    rec.onstop = ()=>{
+      clearInterval(tick); stream.getTracks().forEach(t=>t.stop());
+      blob = new Blob(chunks,{type: rec.mimeType || 'audio/webm'});
+      $('preview').src = URL.createObjectURL(blob); $('preview').style.display='block';
+      $('saveBtn').style.display='block'; $('redoBtn').style.display='block';
+      $('recBtn').classList.remove('going'); $('recBtn').innerHTML='再录<br>一次';
+      $('timer').textContent = '听一听，满意就存下来';
+    };
+    rec.start(); sec=0; $('recBtn').classList.add('going'); $('recBtn').innerHTML='说完了<br>点我';
+    $('timer').textContent='0 秒';
+    tick = setInterval(()=>{ sec++; $('timer').textContent = sec+' 秒'; if(sec>=90) rec.stop(); },1000);
+  }catch(e){
+    $('micHint').textContent = '没拿到麦克风。请在浏览器里允许使用麦克风；微信里打不开的话，点右上角用浏览器打开。';
+  }
+};
+$('redoBtn').onclick = ()=>{ $('preview').style.display='none'; $('saveBtn').style.display='none'; $('redoBtn').style.display='none'; $('timer').textContent='最长90秒，说错了可以重来'; };
+$('saveBtn').onclick = async ()=>{
+  try{ await putVoice(blob); }catch(e){}
+  store.set('start', new Date().toISOString().slice(0,10));
+  store.set('count','0');
+  renderHome(); show('s-home');
+};
+
+// 3 每天打开
+function daysLeft(){
+  const s = store.get('start'); if(!s) return 90;
+  const passed = Math.floor((new Date() - new Date(s+'T00:00:00'))/86400000);
+  return Math.max(0, 90 - passed);
+}
+async function renderHome(){
+  const d = daysLeft();
+  $('hello').textContent = name() + '，我在这里。';
+  $('daysLeft').textContent = d;
+  $('daysLabel').textContent = d>0 ? '天后，我们见面' : '今天，我们见面了';
+  const s = store.get('start'); $('startDate').textContent = s ? ('从 '+s+' 开始') : '';
+  const c = +(store.get('count')||0);
+  $('listenCount').textContent = c>0 ? ('你已经听了 '+c+' 次') : '点一下，听90天后的你说话';
+  const v = await getVoice(); if(v) $('player').src = URL.createObjectURL(v);
+}
+$('playBtn').onclick = ()=>{
+  const p = $('player');
+  if(!p.src){ $('listenCount').textContent='没找到你的声音，重新录一段吧'; return; }
+  if(p.paused){ p.play(); $('playBtn').textContent='❚❚'; } else { p.pause(); $('playBtn').textContent='▶'; }
+};
+$('player').onended = ()=>{
+  $('playBtn').textContent='▶';
+  const c = +(store.get('count')||0)+1; store.set('count', String(c));
+  $('listenCount').textContent = '你已经听了 '+c+' 次。明天见。';
+};
+$('reRecord').onclick = ()=>{ $('recTitle').innerHTML = name()+'，现在你就是<br>90天后的她'; show('s-record'); };
+
+// 飘起来的小爱心
+(()=>{ const box=$('stickers'); for(let i=0;i<9;i++){ const h=document.createElement('i'); h.className='heart'; h.textContent='♥';
+  h.style.left=(Math.random()*100)+'%'; h.style.fontSize=(14+Math.random()*16)+'px';
+  h.style.animationDuration=(9+Math.random()*8)+'s'; h.style.animationDelay=(-Math.random()*12)+'s'; box.appendChild(h);} })();
+
+// 打开时：录过就直接进首页
+(async ()=>{
+  if(store.get('start') && await getVoice()){ renderHome(); show('s-home'); }
+  else show('s-name');
+})();
+</script>
+</body>
+</html>
